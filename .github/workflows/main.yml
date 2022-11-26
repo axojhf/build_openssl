@@ -34,10 +34,19 @@ jobs:
           ./configure mingw64 --prefix=/c/openssl1 -static
           mingw32-make -j
           mingw32-make install
+          cd /c/openssl-3.0.7
+          ./configure mingw64 --prefix=/c/openssl3 -static
+          mingw32-make -j
+          mingw32-make install
       - name: Package Directories
         run: |
           7z a openssl1_mingw_static.7z C:\openssl1
+          7z a openssl3_mingw_static.7z C:\openssl3
       - uses: actions/upload-artifact@v3
         with:
           name: OpenSSL1 MinGW64 Static
           path: openssl1_mingw_static.7z
+      - uses: actions/upload-artifact@v3
+        with:
+          name: OpenSSL3 MinGW64 Static
+          path: openssl3_mingw_static.7z
