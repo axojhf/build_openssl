@@ -58,11 +58,11 @@ jobs:
       - name: Set Perl
         run: |
           (new-object System.Net.WebClient).DownloadFile('https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit-portable.zip','perl.zip')
-          7z x -aoa -oC:\strawberry-perl perl.7z
-          rm perl.7z
+          7z x -aoa -oC:\strawberry-perl perl.zip
+          rm perl.zip
           (new-object System.Net.WebClient).DownloadFile('https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-win64.zip','nasm.zip')
-          7z x -aoa -oC:\ nasm.7z
-          rm nasm.7z
+          7z x -aoa -oC:\ nasm.zip
+          rm nasm.zip
           (new-object System.Net.WebClient).DownloadFile('https://www.openssl.org/source/openssl-1.1.1s.tar.gz','openssl.tar.gz')
           7z x -aoa openssl.tar.gz
           7z x -aoa -oC:\ openssl.tar
