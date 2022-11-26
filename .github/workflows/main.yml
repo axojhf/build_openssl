@@ -83,11 +83,11 @@ jobs:
           cd C:\openssl-1.1.1s
           perl Configure VC-WIN64A --prefix=C:\openssl1 -static
           nmake -j
-          nmake install
+          nmake install_sw
           cd C:\openssl-3.0.7
           perl Configure VC-WIN64A --prefix=C:\openssl3 -static
           nmake -j
-          nmake install
+          nmake install_sw
       - name: Package Directories
         run: |
           7z a openssl1_vc142_static.7z C:\openssl1
