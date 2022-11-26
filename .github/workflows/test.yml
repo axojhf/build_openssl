@@ -1,9 +1,9 @@
-name: 'Static Build'
+name: 'Static Build Test'
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "test" ]
 jobs:
   BuildStatic:
     runs-on: windows-2019
@@ -30,22 +30,22 @@ jobs:
         run: |
           pacman -S --noconfirm perl git
           export PATH="/c/mingw64/bin:$PATH"
-          cd /c/openssl-1.1.1s
-          ./configure mingw64 --prefix=/c/openssl1 -static
-          mingw32-make -j
-          mingw32-make install
+          # cd /c/openssl-1.1.1s
+          # ./configure mingw64 --prefix=/c/openssl1 -static
+          # mingw32-make -j
+          # mingw32-make install
           cd /c/openssl-3.0.7
-          ./configure mingw64 --prefix=/c/openssl3 -static
+          ./Configure mingw64 --prefix=/c/openssl3 -static
           mingw32-make -j
           mingw32-make install
       - name: Package Directories
         run: |
-          7z a openssl1_mingw_static.7z C:\openssl1
+          # 7z a openssl1_mingw_static.7z C:\openssl1
           7z a openssl3_mingw_static.7z C:\openssl3
-      - uses: actions/upload-artifact@v3
-        with:
-          name: OpenSSL1 MinGW64 Static
-          path: openssl1_mingw_static.7z
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: OpenSSL1 MinGW64 Static
+      #     path: openssl1_mingw_static.7z
       - uses: actions/upload-artifact@v3
         with:
           name: OpenSSL3 MinGW64 Static
@@ -80,19 +80,23 @@ jobs:
       - name: Build script
         run: |
           $Env:PATH = "C:\nasm-2.15.05;C:\strawberry-perl\perl\bin;$Env:PATH"
-          cd C:\openssl-1.1.1s
-          perl Configure VC-WIN64A --prefix=C:\openssl1 -static
+          # cd C:\openssl-1.1.1s
+          # perl Configure VC-WIN64A --prefix=C:\openssl1 -static
+          # nmake -j
+          # nmake install
+          cd C:\openssl-3.0.7
+          perl Configure VC-WIN64A --prefix=C:\openssl3 -static
           nmake -j
           nmake install
       - name: Package Directories
         run: |
-          7z a openssl1_vc142_static.7z C:\openssl1
-          # 7z a openssl3_vc142_static.7z C:\openssl3
-      - uses: actions/upload-artifact@v3
-        with:
-          name: OpenSSL1 VC142 Static
-          path: openssl1_vc142_static.7z
+          # 7z a openssl1_vc142_static.7z C:\openssl1
+          7z a openssl3_vc142_static.7z C:\openssl3
       # - uses: actions/upload-artifact@v3
       #   with:
-      #     name: OpenSSL3 vc142 Static
-      #     path: openssl3_vc142_static.7z
+      #     name: OpenSSL1 VC142 Static
+      #     path: openssl1_vc142_static.7z
+      - uses: actions/upload-artifact@v3
+        with:
+          name: OpenSSL3 vc142 Static
+          path: openssl3_vc142_static.7z
