@@ -14,11 +14,15 @@ jobs:
           7z x -aoa -oC:\ mingw64.7z
           rm mingw64.7z
           (new-object System.Net.WebClient).DownloadFile('https://www.openssl.org/source/openssl-1.1.1s.tar.gz','openssl.tar.gz')
-          7z x -aoa -oC:\ openssl.tar.gz
+          7z x -aoa openssl.tar.gz
+          7z x -aoa -oC:\ openssl.tar
           rm openssl.tar.gz
+          rm openssl.tar
           (new-object System.Net.WebClient).DownloadFile('https://www.openssl.org/source/openssl-3.0.7.tar.gz','openssl.tar.gz')
-          7z x -aoa -oC:\ openssl.tar.gz
+          7z x -aoa openssl.tar.gz
+          7z x -aoa -oC:\ openssl.tar
           rm openssl.tar.gz
+          rm openssl.tar
       - uses: msys2/setup-msys2@v2
         with:
           msystem: mingw64
@@ -29,6 +33,7 @@ jobs:
           cd /c/openssl-1.1.1s
           ./configure mingw64 --prefix=/c/openssl1 -static
           mingw32-make -j
+          mingw32-make install
       - name: Package Directories
         run: |
           7z a openssl1_mingw_static.7z C:\openssl1
