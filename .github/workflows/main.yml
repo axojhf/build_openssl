@@ -24,10 +24,10 @@ jobs:
           msystem: mingw64
       - shell: msys2 {0}
         run: |
-          pacman -S perl git
+          pacman -S --noconfirm perl git
           export PATH="/c/mingw64/bin:$PATH"
           cd /c/openssl-1.1.1s
-          ./configure mingw64 --prefix=/c/openssl1
+          ./configure mingw64 --prefix=/c/openssl1 -static
           mingw32-make -j
       - name: Package Directories
         run: |
