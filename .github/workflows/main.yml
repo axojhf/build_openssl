@@ -91,7 +91,7 @@ jobs:
       - name: Package Directories
         run: |
           7z a openssl1_vc142_static.7z C:\openssl1
-          # 7z a openssl3_vc142_static.7z C:\openssl3
+          7z a openssl3_vc142_static.7z C:\openssl3
       - uses: actions/upload-artifact@v3
         with:
           name: OpenSSL1 VC142 Static
