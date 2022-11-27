@@ -34,14 +34,14 @@ jobs:
       #     msystem: mingw64
       - shell: powershell
         run: |
-          $env:PATH = "C:\mingw64\bin;C:\ninja;C:\openssl3\lib;C:\openssl3\include;C:\openssl3\bin;C:\Program Files\PowerShell\7;C:\Program Files\CMake\bin;C:\Windows\System32\WindowsPowerShell\v1.0" + $env:PATH
+          $env:PATH = "C:\mingw64\bin;C:\ninja;C:\openssl3\lib;C:\openssl3\include;C:\openssl3\bin;C:\Program Files\PowerShell\7;C:\Program Files\CMake\bin;C:\Windows\System32\WindowsPowerShell\v1.0"
 
           cd c:\zlib-1.2.13
           cmake -G Ninja -DCMAKE_INSTALL_PREFIX=C:/zlib -DZLIB_COMPAT=ON -DBUILD_SHARED_LIBS=OFF
           cmake --build . --config Release
           cmake --install . --config Release
           rm C:/zlib/lib/libzlib.dll.a
-          cp C:/zlib/lib/libzlibstatic.a C:/zlib/lib/zlib.a
+          cp C:/zlib/lib/libzlibstatic.a C:/zlib/lib/libz.a
 
           $env:PATH = "C:\zlib\include;C:\zlib\lib" + $env:PATH
 
