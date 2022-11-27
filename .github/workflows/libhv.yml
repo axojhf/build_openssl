@@ -43,7 +43,7 @@ jobs:
           rm C:/zlib/lib/libzlib.dll.a
           cp C:/zlib/lib/libzlibstatic.a C:/zlib/lib/libz.a
 
-          $env:PATH = "C:\zlib\include;C:\zlib\lib" + $env:PATH
+          $env:PATH = "C:\zlib\include;C:\zlib\lib;$env:PATH"
 
           cd c:\nghttp2-1.51.0
           cmake -G Ninja -DCMAKE_INSTALL_PREFIX=C:/nghttp2 -DENABLE_STATIC_LIB=ON -DENABLE_SHARED_LIB=OFF -DENABLE_EXAMPLES=OFF
