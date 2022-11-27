@@ -26,29 +26,27 @@ jobs:
           rm zlib.zip
           cd C:\
           git clone --depth=1 https://github.com/ithewei/libhv.git
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: mingw64
-      - shell: msys2 {0}
+      # - uses: msys2/setup-msys2@v2
+      #   with:
+      #     msystem: mingw64
+      - shell: powershell
         run: |
-          pacman -S --noconfirm perl git cmake make ninja
-          export PATH="/c/mingw64/bin:/c/openssl3/lib:/c/openssl3/include:$PATH"
-          cd /c/nghttp2-1.51.0
-          ./configure --prefix=/c/nghttp2 --enable-lib-only --enable-static --disable-shared --disable-app --disable-examples --disable-hpack-tools --disable-python-bindings --disable-thread-local-storage --disable-threads --disable-verbose
-          mingw32-make -j
-          mingw32-make install
-          cd /c/zlib-1.2.13
-          ./configure --prefix=/c/zlib --static
-          mingw32-make -j
-          mingw32-make install
-          cd /c/libhv
+          $env:PATH = "C:/mingw64/bin;C:/openssl3/lib;C:/openssl3/include;" + $env:PATH
+          cd c:\nghttp2-1.51.0
+          cmake -G ninja -DCMAKE_INSTALL_PREFIX=C:/nghttp2 -DENABLE_STATIC_LIB=ON -DENABLE_SHARED_LIB=OFF -DENABLE_EXAMPLES=OFF
+          cmake --build . --config Release
+          cmake --install . --config Release
+          cd c:\zlib-1.2.13
+          cmake -G ninja -DCMAKE_INSTALL_PREFIX=C:/zlib -DZLIB_COMPAT=ON -DBUILD_SHARED_LIBS=OFF
+          cmake --build . --config Release
+          cmake --install . --config Release
+          cd c:\libhv
           mkdir 3rd
-          cp /c/openssl3 /c/nghttp2 /c/zlib -r 3rd
-          mkdir build
-          cd build
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/c/libhv/install ..
-          ninja
-          ninja install
+          # 复制C:/openssl3，C:/nghttp2，C:/zlib到C:\libhv\3rd
+          cp -r C:/openssl3 C:/nghttp2 C:/zlib C:/libhv/3rd
+          cmake -G ninja -DCMAKE_INSTALL_PREFIX=C:/libhv -DENABLE_STATIC_LIB=ON -DENABLE_SHARED_LIB=OFF -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF -DENABLE_OPENSSL=ON -DENABLE_ZLIB=ON -DENABLE_NGHTTP2=ON
+          cmake --build . --config Release
+          cmake --install . --config Release
       - name: Package Directories
         run: |
           #使用7z将C:\libhv\install目录打包为libhv.7z
