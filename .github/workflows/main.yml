@@ -100,3 +100,52 @@ jobs:
         with:
           name: OpenSSL3 vc142 Static
           path: openssl3_vc142_static.7z
+
+  VC143StaticBuild:
+    runs-on: windows-2022
+    steps:
+      - name: Set Perl
+        run: |
+          (new-object System.Net.WebClient).DownloadFile('https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit-portable.zip','perl.zip')
+          7z x -aoa -oC:\strawberry-perl perl.zip
+          rm perl.zip
+          (new-object System.Net.WebClient).DownloadFile('https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip','nasm.zip')
+          7z x -aoa -oC:\ nasm.zip
+          rm nasm.zip
+          (new-object System.Net.WebClient).DownloadFile('https://www.openssl.org/source/openssl-1.1.1s.tar.gz','openssl.tar.gz')
+          7z x -aoa openssl.tar.gz
+          7z x -aoa -oC:\ openssl.tar
+          rm openssl.tar.gz
+          rm openssl.tar
+          (new-object System.Net.WebClient).DownloadFile('https://www.openssl.org/source/openssl-3.0.7.tar.gz','openssl.tar.gz')
+          7z x -aoa openssl.tar.gz
+          7z x -aoa -oC:\ openssl.tar
+          rm openssl.tar.gz
+          rm openssl.tar
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+          toolset: 14.3
+      - name: Build script
+        run: |
+          $Env:PATH = "C:\nasm-2.16.01;C:\strawberry-perl\perl\bin;$Env:PATH"
+          cd C:\openssl-1.1.1s
+          perl Configure VC-WIN64A --prefix=C:\openssl1 -static
+          nmake -j
+          nmake install_sw
+          cd C:\openssl-3.0.7
+          perl Configure VC-WIN64A --prefix=C:\openssl3 -static
+          nmake -j
+          nmake install_sw
+      - name: Package Directories
+        run: |
+          7z a openssl1_vc143_static.7z C:\openssl1
+          7z a openssl3_vc143_static.7z C:\openssl3
+      - uses: actions/upload-artifact@v3
+        with:
+          name: OpenSSL1 VC143 Static
+          path: openssl1_vc143_static.7z
+      - uses: actions/upload-artifact@v3
+        with:
+          name: OpenSSL3 vc143 Static
+          path: openssl3_vc143_static.7z
