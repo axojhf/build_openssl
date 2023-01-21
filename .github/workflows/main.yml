@@ -22,6 +22,10 @@ jobs:
         run: |
           $env:Path = "C:\mingw64\bin;C:\ninja;$env:Path"
           cd C:\boringssl
+          # 将CMakeLists.txt中的set(CMAKE_GENERATOR_CC cl)改成set(CMAKE_GENERATOR_CC gcc)
+          $fileContent = Get-Content 'CMakeLists.txt'
+          $fileContent = $fileContent -replace 'set\(CMAKE_GENERATOR_CC cl\)','set\(CMAKE_GENERATOR_CC gcc\)'
+          $fileContent | Set-Content 'CMakeLists.txt'
           mkdir build
           cd build
           cmake .. -GNinja -DCMAKE_GENERATOR_CC=gcc -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
