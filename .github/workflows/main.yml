@@ -24,7 +24,7 @@ jobs:
           cd C:\boringssl
           mkdir build
           cd build
-          cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
+          cmake .. -GNinja -DCMAKE_GENERATOR_CC=gcc -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
           ninja
           ninja install
       - name: Package Directories
