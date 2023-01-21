@@ -23,7 +23,7 @@ jobs:
           git clone --depth=1 https://github.com/google/boringssl.git -b chromium-stable
       - name: Build
         run: |
-          $env:Path = "C:\mingw64\bin;C:\ninja;$env:Path"
+          $env:Path = "C:\mingw64\bin;C:\ninja;C:\nasm-2.16.01;$env:Path"
           cd C:\boringssl
           # 将CMakeLists.txt中的set(CMAKE_GENERATOR_CC cl)改成set(CMAKE_GENERATOR_CC gcc)
           $fileContent = Get-Content 'CMakeLists.txt'
@@ -53,9 +53,9 @@ jobs:
     steps:
       - name: Set Perl
         run: |
-          (new-object System.Net.WebClient).DownloadFile('https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit-portable.zip','perl.zip')
-          7z x -aoa -oC:\strawberry-perl perl.zip
-          rm perl.zip
+          # (new-object System.Net.WebClient).DownloadFile('https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit-portable.zip','perl.zip')
+          # 7z x -aoa -oC:\strawberry-perl perl.zip
+          # rm perl.zip
           (new-object System.Net.WebClient).DownloadFile('https://www.nasm.us/pub/nasm/releasebuilds/2.16.01/win64/nasm-2.16.01-win64.zip','nasm.zip')
           7z x -aoa -oC:\ nasm.zip
           rm nasm.zip
@@ -73,7 +73,7 @@ jobs:
           toolset: 14.3
       - name: Build script
         run: |
-          $Env:PATH = "C:\nasm-2.16.01;C:\strawberry-perl\perl\bin;$Env:PATH"
+          $Env:PATH = "C:\nasm-2.16.01;$Env:PATH"
           cd C:\boringssl
           mkdir build
           cd build
