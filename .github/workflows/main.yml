@@ -28,11 +28,12 @@ jobs:
           
           $fileContent = Get-Content 'CMakeLists.txt'
           $fileContent = $fileContent -replace 'set\(CMAKE_GENERATOR_CC cl\)','set(CMAKE_GENERATOR_CC gcc)'
+          $fileContent = $fileContent -replace 'set\(C_CXX_FLAGS "-Werror (.*)"\)','set(C_CXX_FLAGS "$1")'
           $fileContent | Set-Content 'CMakeLists.txt'
           $fileContent = Get-Content 'ssl\test\CMakeLists.txt'
           $fileContent = $fileContent -replace 'target_link_libraries\((.*)\)','target_link_libraries($1 ws2_32)'
           $fileContent | Set-Content 'ssl\test\CMakeLists.txt'
-          
+
           mkdir build
           cd build
           cmake .. -GNinja -DCMAKE_GENERATOR_CC=gcc -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
@@ -56,7 +57,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: boringssl
       - name: Set Perl
