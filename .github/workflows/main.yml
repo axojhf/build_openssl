@@ -30,9 +30,14 @@ jobs:
           $fileContent = $fileContent -replace 'set\(CMAKE_GENERATOR_CC cl\)','set(CMAKE_GENERATOR_CC gcc)'
           $fileContent = $fileContent -replace 'set\(C_CXX_FLAGS "-Werror (.*)"\)','set(C_CXX_FLAGS "$1")'
           $fileContent | Set-Content 'CMakeLists.txt'
+
           $fileContent = Get-Content 'ssl\test\CMakeLists.txt'
           $fileContent = $fileContent -replace 'target_link_libraries\((.*)\)','target_link_libraries($1 ws2_32)'
           $fileContent | Set-Content 'ssl\test\CMakeLists.txt'
+
+          $fileContent = Get-Content 'tool\CMakeLists.txt'
+          $fileContent = $fileContent -replace 'target_link_libraries\((.*)\)','target_link_libraries($1 ws2_32 Wldap32 Crypt32)'
+          $fileContent | Set-Content 'tool\CMakeLists.txt'
 
           mkdir build
           cd build
