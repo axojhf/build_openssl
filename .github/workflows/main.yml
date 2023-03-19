@@ -23,7 +23,7 @@ jobs:
           cd C:\
           git clone --depth=1 https://github.com/google/boringssl.git -b chromium-stable
           cd boringssl
-          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=$Env:ANDROID_NDK/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
+          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=${{steps.setup-ndk.outputs.ndk-path}}/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
       - name: Package Directories
         run: |
           7z a boringssl_ndk_static.7z C:\boringssl_install
