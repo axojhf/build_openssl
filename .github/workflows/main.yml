@@ -21,15 +21,20 @@ jobs:
           git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
           cd boringssl
           cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
+          ninja ; ninja install
+          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_share_install
+          ninja ; ninja install
       - name: Package Directories
         run: |
-          7z a boringssl_ndk_static.7z C:\boringssl_install
+          7z a armv7_boringssl_ndk_static.7z C:\boringssl_install
+          7z a armv7_boringssl_share_install.7z C:\boringssl_share_install
       - name: Update NDK BoringSSL Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: NDK_BoringSSL
           files: |
-            boringssl_ndk_static.7z
+            armv7_boringssl_ndk_static.7z
+            armv7_boringssl_share_install.7z
       # - uses: actions/upload-artifact@v3
       #   with:
       #     name: OpenSSL1_MinGW64_Static
