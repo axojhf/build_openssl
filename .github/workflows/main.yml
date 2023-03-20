@@ -1,9 +1,9 @@
 name: 'NDK BoringSSL Build'
 on:
   push:
-    branches: [ "ndk-boring" ]
+    branches: [ "chromium-boringssl" ]
   pull_request:
-    branches: [ "ndk-boring" ]
+    branches: [ "chromium-boringssl" ]
 jobs:
   armv7:
     runs-on: windows-2022
@@ -14,86 +14,89 @@ jobs:
           7z x -aoa -oC:\ninja ninja-win.zip ; rm ninja-win.zip
           (new-object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/android-ndk-r23c-windows.zip','android-ndk.zip')
           7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
+          (new-object System.Net.WebClient).DownloadFile('https://storage.googleapis.com/chrome-infra/depot_tools.zip','depot_tools.zip')
+          7z x -aoa -oC:\depot depot_tools.zip ; rm depot_tools.zip
+          cd C:\ ; git clone --depth=1 https://chromium.googlesource.com/chromium/src
       - name: Build
         run: |
-          $env:Path = "C:\ninja;$env:Path"
-          cd C:\
-          git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
-          cd boringssl
-          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_install
-          ninja ; ninja install
-          cmake -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-24 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_share_install
-          ninja ; ninja install
-      - name: Package Directories
-        run: |
-          7z a armv7_boringssl_ndk_static.7z C:\boringssl_install
-          7z a armv7_boringssl_ndk_share.7z C:\boringssl_share_install
-      - name: Update NDK BoringSSL Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: NDK_BoringSSL
-          files: |
-            armv7_boringssl_ndk_static.7z
-            armv7_boringssl_ndk_share.7z
+          $env:Path = "C:\ninja;C:\depot;C:\android-ndk;$env:Path"
+          $env:ANDROID_NDK = "C:\android-ndk"
+          cd C:\chromium\third_party\boringssl ; gclient
+          gn gen out/Release --args='is_component_build = true is_debug = true target_cpu = "arm" target_os = "android"'
+          ninja -C out/Release ; ninja -C out/Release install
+      # - name: Package Directories
+      #   run: |
+      #     # 7z a armv7_boringssl_ndk_static.7z C:\boringssl_install
+      #     # 7z a armv7_boringssl_ndk_share.7z C:\boringssl_share_install
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     path: armv7_boringssl_ndk.7z
+      # - name: Update NDK BoringSSL Release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     tag_name: NDK_BoringSSL
+      #     files: |
+      #       armv7_boringssl_ndk_static.7z
+      #       armv7_boringssl_ndk_share.7z
 
-  armv8:
-    runs-on: windows-2022
-    steps:
-      - name: Set Ninja NDK
-        run: |
-          (new-object System.Net.WebClient).DownloadFile('https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip','ninja-win.zip')
-          7z x -aoa -oC:\ninja ninja-win.zip ; rm ninja-win.zip
-          (new-object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/android-ndk-r23c-windows.zip','android-ndk.zip')
-          7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
-      - name: Build
-        run: |
-          $env:Path = "C:\ninja;$env:Path"
-          cd C:\
-          git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
-          cd boringssl
-          cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_armv8
-          ninja ; ninja install
-          cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_armv8_share
-          ninja ; ninja install
-      - name: Package Directories
-        run: |
-          7z a armv8_boringssl_ndk_static.7z C:\boringssl_armv8
-          7z a armv8_boringssl_ndk_share.7z C:\boringssl_armv8_share
-      - name: Update NDK BoringSSL Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: NDK_BoringSSL
-          files: |
-            armv8_boringssl_ndk_static.7z
-            armv8_boringssl_ndk_share.7z
+  # armv8:
+  #   runs-on: windows-2022
+  #   steps:
+  #     - name: Set Ninja NDK
+  #       run: |
+  #         (new-object System.Net.WebClient).DownloadFile('https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip','ninja-win.zip')
+  #         7z x -aoa -oC:\ninja ninja-win.zip ; rm ninja-win.zip
+  #         (new-object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/android-ndk-r23c-windows.zip','android-ndk.zip')
+  #         7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
+  #     - name: Build
+  #       run: |
+  #         $env:Path = "C:\ninja;$env:Path"
+  #         cd C:\
+  #         git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
+  #         cd boringssl
+  #         cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_armv8
+  #         ninja ; ninja install
+  #         cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_armv8_share
+  #         ninja ; ninja install
+  #     - name: Package Directories
+  #       run: |
+  #         7z a armv8_boringssl_ndk_static.7z C:\boringssl_armv8
+  #         7z a armv8_boringssl_ndk_share.7z C:\boringssl_armv8_share
+  #     - name: Update NDK BoringSSL Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         tag_name: NDK_BoringSSL
+  #         files: |
+  #           armv8_boringssl_ndk_static.7z
+  #           armv8_boringssl_ndk_share.7z
 
-  x86_64:
-    runs-on: windows-2022
-    steps:
-      - name: Set Ninja NDK
-        run: |
-          (new-object System.Net.WebClient).DownloadFile('https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip','ninja-win.zip')
-          7z x -aoa -oC:\ninja ninja-win.zip ; rm ninja-win.zip
-          (new-object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/android-ndk-r23c-windows.zip','android-ndk.zip')
-          7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
-      - name: Build
-        run: |
-          $env:Path = "C:\ninja;$env:Path"
-          cd C:\
-          git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
-          cd boringssl
-          cmake -DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_x86_64
-          ninja ; ninja install
-          cmake -DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_x86_64_share
-          ninja ; ninja install
-      - name: Package Directories
-        run: |
-          7z a x86_64_boringssl_ndk_static.7z C:\boringssl_x86_64
-          7z a x86_64_boringssl_ndk_share.7z C:\boringssl_x86_64_share
-      - name: Update NDK BoringSSL Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: NDK_BoringSSL
-          files: |
-            x86_64_boringssl_ndk_static.7z
-            x86_64_boringssl_ndk_share.7z
+  # x86_64:
+  #   runs-on: windows-2022
+  #   steps:
+  #     - name: Set Ninja NDK
+  #       run: |
+  #         (new-object System.Net.WebClient).DownloadFile('https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-win.zip','ninja-win.zip')
+  #         7z x -aoa -oC:\ninja ninja-win.zip ; rm ninja-win.zip
+  #         (new-object System.Net.WebClient).DownloadFile('https://dl.google.com/android/repository/android-ndk-r23c-windows.zip','android-ndk.zip')
+  #         7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
+  #     - name: Build
+  #       run: |
+  #         $env:Path = "C:\ninja;$env:Path"
+  #         cd C:\
+  #         git clone --depth=1 https://boringssl.googlesource.com/boringssl -b chromium-stable
+  #         cd boringssl
+  #         cmake -DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=C:\boringssl_x86_64
+  #         ninja ; ninja install
+  #         cmake -DANDROID_ABI=x86_64 -DANDROID_PLATFORM=android-29 -DCMAKE_TOOLCHAIN_FILE=C:/android-ndk/build/cmake/android.toolchain.cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=C:\boringssl_x86_64_share
+  #         ninja ; ninja install
+  #     - name: Package Directories
+  #       run: |
+  #         7z a x86_64_boringssl_ndk_static.7z C:\boringssl_x86_64
+  #         7z a x86_64_boringssl_ndk_share.7z C:\boringssl_x86_64_share
+  #     - name: Update NDK BoringSSL Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         tag_name: NDK_BoringSSL
+  #         files: |
+  #           x86_64_boringssl_ndk_static.7z
+  #           x86_64_boringssl_ndk_share.7z
