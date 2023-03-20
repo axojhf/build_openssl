@@ -16,7 +16,11 @@ jobs:
           7z x -aoa -oC:\ android-ndk.zip ; rm android-ndk.zip ; mv C:\android-ndk-r23c C:\android-ndk
           (new-object System.Net.WebClient).DownloadFile('https://storage.googleapis.com/chrome-infra/depot_tools.zip','depot_tools.zip')
           7z x -aoa -oC:\depot depot_tools.zip ; rm depot_tools.zip
-          cd C:\ ; git clone --depth=1 https://chromium.googlesource.com/chromium/src
+          # cd C:\ ; git clone --depth=1 https://chromium.googlesource.com/chromium/src chromium
+          cd C:\ ; mkdir chromium ; cd chromium ; git init ; git remote add -f origin https://chromium.googlesource.com/chromium/src ; git config core.sparsecheckout true
+          echo "third_party/boringssl" >> .git/info/sparse-checkout
+          git pull origin master
+
       - name: Build
         run: |
           $env:Path = "C:\ninja;C:\depot;C:\android-ndk;$env:Path"
