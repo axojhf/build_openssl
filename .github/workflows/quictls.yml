@@ -1,9 +1,9 @@
 name: 'Static Build'
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "quictls" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "quictls" ]
 jobs:
   BuildStatic:
     runs-on: windows-2019
