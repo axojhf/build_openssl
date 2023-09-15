@@ -21,9 +21,9 @@ jobs:
           pacman -S --noconfirm perl git make
           export PATH="/c/mingw64/bin:$PATH"
           cd /c/openssl
-          ./config mingw64 enable-tls1_3 --prefix=/c/openssl_install -static
+          ./config mingw64 enable-tls1_3 --prefix=/c/openssl_install -static no-tests
           make -j
-          make install
+          make install_sw
       - name: Package Directories
         run: |
           7z a quictls_mingw_static.7z C:\openssl_install
